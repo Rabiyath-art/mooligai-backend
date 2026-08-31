@@ -1,14 +1,19 @@
+const dotenv = require("dotenv");
+dotenv.config();
+
 const express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv");
 const session = require("express-session");
 const passport = require("./config/passport");
 
 const categoryRoutes = require("./routes/category.routes");
 const productRoutes = require("./routes/product.routes");
 const authRoutes = require("./routes/auth.routes");
-
-dotenv.config();
+const cartRoutes = require("./routes/cart.routes");
+const wishlistRoutes = require("./routes/wishlist.routes");
+const orderRoutes = require("./routes/order.routes");
+const addressRoutes = require("./routes/address.routes");
+const paymentRoutes = require("./routes/payment.routes");
 
 const app = express();
 
@@ -53,5 +58,10 @@ app.use("/api/auth", authRoutes);
 
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/cart", cartRoutes);
+app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/addresses", addressRoutes);
+app.use("/api/payments", paymentRoutes);
 
 module.exports = app;
