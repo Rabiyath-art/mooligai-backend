@@ -9,6 +9,7 @@ const createOrder = async (
     userId,
     addressId
 ) => {
+
     const cart = await Cart.findOne({
         user: userId
     }).populate("items.product");
@@ -31,6 +32,7 @@ const createOrder = async (
     const orderItems = [];
 
     for (const item of cart.items) {
+
         const product = item.product;
 
         if (!product || !product.isActive) {
@@ -59,72 +61,66 @@ const createOrder = async (
         });
     }
 
-    const session =
-        await mongoose.startSession();
 
-    session.startTransaction();
+    // Reduce stock
 
-    try {
-        for (const item of cart.items) {
-            await Product.findByIdAndUpdate(
-                item.product._id,
-                {
-                    $inc: {
-                        stock: -item.quantity
-                    }
-                },
-                { session }
-            );
-        }
+    for (const item of cart.items) {
 
-        const order = await Order.create(
-            [
-                {
-                    user: userId,
-
-                    items: orderItems,
-
-                    shippingAddress: {
-                        name: address.name,
-                        phone: address.phone,
-                        addressLine1:
-                            address.addressLine1,
-                        addressLine2:
-                            address.addressLine2,
-                        city: address.city,
-                        state: address.state,
-                        pincode: address.pincode
-                    },
-
-                    totalAmount,
-
-                    payment: {
-                        provider: "razorpay",
-                        status: "pending"
-                    },
-
-                    orderStatus: "pending"
+        await Product.findByIdAndUpdate(
+            item.product._id,
+            {
+                $inc: {
+                    stock: -item.quantity
                 }
-            ],
-            { session }
+            }
         );
 
-        await Cart.findOneAndUpdate(
-            { user: userId },
-            { $set: { items: [] } },
-            { session }
-        );
-
-        await session.commitTransaction();
-
-        return order[0];
-    } catch (error) {
-        await session.abortTransaction();
-
-        throw error;
-    } finally {
-        await session.endSession();
     }
+
+
+    // Create MongoDB Order
+
+    const order = await Order.create({
+        user: userId,
+
+        items: orderItems,
+
+        shippingAddress: {
+            name: address.name,
+            phone: address.phone,
+            addressLine1:
+                address.addressLine1,
+            addressLine2:
+                address.addressLine2,
+            city: address.city,
+            state: address.state,
+            pincode: address.pincode
+        },
+
+        totalAmount,
+
+        payment: {
+            provider: "razorpay",
+            status: "pending"
+        },
+
+        orderStatus: "pending"
+    });
+
+
+    // Clear Cart
+
+    await Cart.findOneAndUpdate(
+        { user: userId },
+        {
+            $set: {
+                items: []
+            }
+        }
+    );
+
+
+    return order;
 };
 
 const getMyOrders = async (userId) => {
