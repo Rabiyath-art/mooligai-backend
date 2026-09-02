@@ -8,12 +8,57 @@ const {
     deleteCategory
 } = require("../controllers/category.controller");
 
+const {
+    requireAdmin
+} = require("../middleware/admin.middleware");
+
 const router = express.Router();
 
-router.post("/", createCategory);
-router.get("/", getCategories);
-router.get("/:id", getCategoryById);
-router.put("/:id", updateCategory);
-router.delete("/:id", deleteCategory);
+
+// =========================
+// PUBLIC
+// =========================
+
+// Get active categories
+router.get(
+    "/",
+    getCategories
+);
+
+
+// Get category by ID
+router.get(
+    "/:id",
+    getCategoryById
+);
+
+
+// =========================
+// ADMIN
+// =========================
+
+// Create category
+router.post(
+    "/",
+    requireAdmin,
+    createCategory
+);
+
+
+// Update category
+router.put(
+    "/:id",
+    requireAdmin,
+    updateCategory
+);
+
+
+// Delete category
+router.delete(
+    "/:id",
+    requireAdmin,
+    deleteCategory
+);
+
 
 module.exports = router;

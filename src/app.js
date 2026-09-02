@@ -2,6 +2,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const express = require("express");
+const path = require("path");
 const cors = require("cors");
 const session = require("express-session");
 const passport = require("./config/passport");
@@ -14,6 +15,9 @@ const wishlistRoutes = require("./routes/wishlist.routes");
 const orderRoutes = require("./routes/order.routes");
 const addressRoutes = require("./routes/address.routes");
 const paymentRoutes = require("./routes/payment.routes");
+const adminRoutes = require("./routes/admin.routes");
+const adminOrderRoutes = require("./routes/admin-order.routes");
+const adminProductRoutes = require("./routes/admin-product.routes");
 
 const app = express();
 
@@ -55,6 +59,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
@@ -63,5 +68,8 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/addresses", addressRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/admin/orders", adminOrderRoutes);
+app.use("/api/admin/products", adminProductRoutes);
 
 module.exports = app;

@@ -4,12 +4,19 @@ const createCategory = async (data) => {
     return await Category.create(data);
 };
 
+
+// for getting category details
 const getCategories = async () => {
     return await Category.find({ isActive: true }).sort({ name: 1 });
 };
 
 const getCategoryById = async (id) => {
-    return await Category.findById(id);
+
+    return await Category.findOne({
+        _id: id,
+        isActive: true
+    });
+
 };
 
 const updateCategory = async (id, data) => {
@@ -23,8 +30,19 @@ const updateCategory = async (id, data) => {
     );
 };
 
+// only need soft delete 
 const deleteCategory = async (id) => {
-    return await Category.findByIdAndDelete(id);
+
+    return await Category.findByIdAndUpdate(
+        id,
+        {
+            isActive: false
+        },
+        {
+            new: true
+        }
+    );
+
 };
 
 module.exports = {
