@@ -82,11 +82,11 @@
 // // ADMIN WRITE
 // // =========================
 
-// // router.post(
-// //     "/",
-// //     requireAdmin,
-// //     createProduct
-// // );
+// router.post(
+//     "/",
+//     requireAdmin,
+//     createProduct
+// );
 
 // router.put(
 //     "/:id",

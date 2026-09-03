@@ -110,10 +110,142 @@ const deleteCategory = async (req, res) => {
     }
 };
 
+
+const updateCategoryStatus = async (
+    req,
+    res
+) => {
+
+    try {
+
+        const {
+            isActive
+        } = req.body;
+
+
+        if (
+            typeof isActive !== "boolean"
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "isActive must be true or false"
+
+            });
+
+        }
+
+
+        const category =
+            await categoryService
+                .updateCategoryStatus(
+                    req.params.id,
+                    isActive
+                );
+
+
+        if (!category) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Category not found"
+
+            });
+
+        }
+
+
+        res.status(200).json({
+
+            success: true,
+
+            message:
+                "Category status updated successfully",
+
+            data: category
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Category status error:",
+            error
+        );
+
+
+        res.status(400).json({
+
+            success: false,
+
+            message:
+                error.message
+
+        });
+
+    }
+
+};
+
+const getAdminCategories = async (
+    req,
+    res
+) => {
+
+    try {
+
+        const result =
+            await categoryService
+                .getAdminCategories(
+                    req.query
+                );
+
+
+        res.status(200).json({
+
+            success: true,
+
+            data:
+                result.categories,
+
+            pagination:
+                result.pagination
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Admin categories error:",
+            error
+        );
+
+
+        res.status(500).json({
+
+            success: false,
+
+            message:
+                error.message
+
+        });
+
+    }
+
+};
+
 module.exports = {
     createCategory,
     getCategories,
     getCategoryById,
     updateCategory,
+    updateCategoryStatus,
+    getAdminCategories,
     deleteCategory
 };

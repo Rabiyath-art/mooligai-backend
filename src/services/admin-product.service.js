@@ -1,9 +1,10 @@
+const mongoose = require("mongoose");
 const Product = require("../models/Product");
 
 
-// =========================
+// ========================================
 // GET ADMIN PRODUCTS
-// =========================
+// ========================================
 
 const getAdminProducts = async (query) => {
 
@@ -13,16 +14,17 @@ const getAdminProducts = async (query) => {
         status,
         stock,
         page = 1,
-        limit = 10
+        limit = 10,
+        sort
     } = query;
 
 
     const filter = {};
 
 
-    // =========================
+    // ========================================
     // SEARCH
-    // =========================
+    // ========================================
 
     if (search) {
 
@@ -47,20 +49,26 @@ const getAdminProducts = async (query) => {
     }
 
 
-    // =========================
+    // ========================================
     // CATEGORY
-    // =========================
+    // ========================================
 
     if (category) {
 
-        filter.category = category;
+        if (
+            mongoose.Types.ObjectId.isValid(category)
+        ) {
+
+            filter.category = category;
+
+        }
 
     }
 
 
-    // =========================
-    // ACTIVE / INACTIVE
-    // =========================
+    // ========================================
+    // STATUS
+    // ========================================
 
     if (status === "active") {
 
@@ -75,9 +83,9 @@ const getAdminProducts = async (query) => {
     }
 
 
-    // =========================
-    // STOCK FILTER
-    // =========================
+    // ========================================
+    // STOCK
+    // ========================================
 
     if (stock === "out") {
 
@@ -103,15 +111,16 @@ const getAdminProducts = async (query) => {
     }
 
 
-    // =========================
+    // ========================================
     // PAGINATION
-    // =========================
+    // ========================================
 
     const currentPage =
         Math.max(
             Number(page) || 1,
             1
         );
+
 
     const itemsPerPage =
         Math.min(
@@ -122,39 +131,97 @@ const getAdminProducts = async (query) => {
             100
         );
 
+
     const skip =
         (currentPage - 1) *
         itemsPerPage;
 
 
-    // =========================
-    // QUERY
-    // =========================
+    // ========================================
+    // SORT
+    // ========================================
 
-    const [products, total] =
-        await Promise.all([
-
-            Product.find(filter)
-
-                .populate(
-                    "category",
-                    "name slug"
-                )
-
-                .sort({
-                    createdAt: -1
-                })
-
-                .skip(skip)
-
-                .limit(itemsPerPage)
-
-                .lean(),
+    let sortOption = {
+        createdAt: -1
+    };
 
 
-            Product.countDocuments(filter)
+    if (sort === "name_asc") {
 
-        ]);
+        sortOption = {
+            name: 1
+        };
+
+    }
+
+    if (sort === "name_desc") {
+
+        sortOption = {
+            name: -1
+        };
+
+    }
+
+    if (sort === "price_asc") {
+
+        sortOption = {
+            price: 1
+        };
+
+    }
+
+    if (sort === "price_desc") {
+
+        sortOption = {
+            price: -1
+        };
+
+    }
+
+    if (sort === "stock_asc") {
+
+        sortOption = {
+            stock: 1
+        };
+
+    }
+
+    if (sort === "stock_desc") {
+
+        sortOption = {
+            stock: -1
+        };
+
+    }
+
+
+    // ========================================
+    // DATABASE
+    // ========================================
+
+    const [
+        products,
+        total
+    ] = await Promise.all([
+
+        Product.find(filter)
+
+            .populate(
+                "category",
+                "name slug"
+            )
+
+            .sort(sortOption)
+
+            .skip(skip)
+
+            .limit(itemsPerPage)
+
+            .lean(),
+
+        Product.countDocuments(filter)
+
+    ]);
 
 
     return {
@@ -182,29 +249,101 @@ const getAdminProducts = async (query) => {
 };
 
 
-// =========================
-// GET ADMIN PRODUCT
-// =========================
+// ========================================
+// GET ADMIN PRODUCT BY ID
+// ========================================
 
-const getAdminProductById = async (id) => {
+const getAdminProductById = async (
+    req,
+    res
+) => {
 
-    return await Product.findById(id)
+    try {
 
-        .populate(
-            "category",
-            "name slug"
-        )
+        const { id } = req.params;
 
-        .lean();
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Invalid product ID"
+
+            });
+
+        }
+
+
+        const product =
+            await adminProductService
+                .getAdminProductById(id);
+
+
+        if (!product) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Product not found"
+
+            });
+
+        }
+
+
+        return res.status(200).json({
+
+            success: true,
+
+            data: product
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Admin product detail error:",
+            error
+        );
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: error.message
+
+        });
+
+    }
 
 };
+
+// ========================================
+// UPDATE PRODUCT STATUS
+// ========================================
 
 const updateProductStatus = async (
     id,
     isActive
 ) => {
 
+    if (
+        !mongoose.Types.ObjectId.isValid(id)
+    ) {
+
+        return null;
+
+    }
+
+
     return await Product.findByIdAndUpdate(
+
         id,
 
         {
@@ -217,10 +356,12 @@ const updateProductStatus = async (
         }
 
     )
+
         .populate(
             "category",
             "name slug"
         )
+
         .lean();
 
 };

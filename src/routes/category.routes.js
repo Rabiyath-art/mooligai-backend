@@ -5,7 +5,8 @@ const {
     getCategories,
     getCategoryById,
     updateCategory,
-    deleteCategory
+    deleteCategory,
+    getAdminCategories
 } = require("../controllers/category.controller");
 
 const {
@@ -20,38 +21,22 @@ const router = express.Router();
 // =========================
 
 // Get active categories
-router.get(
-    "/",
-    getCategories
-);
+router.get("/", getCategories);
 
+router.get("/admin/list", requireAdmin, getAdminCategories);
 
 // Get category by ID
-router.get(
-    "/:id",
-    getCategoryById
-);
-
+router.get("/:id", getCategoryById);
 
 // =========================
 // ADMIN
 // =========================
 
 // Create category
-router.post(
-    "/",
-    requireAdmin,
-    createCategory
-);
-
+router.post("/", requireAdmin, createCategory);
 
 // Update category
-router.put(
-    "/:id",
-    requireAdmin,
-    updateCategory
-);
-
+router.put("/:id", requireAdmin, updateCategory);
 
 // Delete category
 router.delete(

@@ -18,6 +18,7 @@ const paymentRoutes = require("./routes/payment.routes");
 const adminRoutes = require("./routes/admin.routes");
 const adminOrderRoutes = require("./routes/admin-order.routes");
 const adminProductRoutes = require("./routes/admin-product.routes");
+const adminCustomerRoutes = require("./routes/admin-customer.routes");
 
 const app = express();
 
@@ -71,5 +72,6 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/admin/orders", adminOrderRoutes);
 app.use("/api/admin/products", adminProductRoutes);
+app.use("/api/admin/customers", adminCustomerRoutes);
 
 module.exports = app;

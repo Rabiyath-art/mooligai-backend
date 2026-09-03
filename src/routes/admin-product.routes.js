@@ -1,17 +1,113 @@
+// const express = require("express");
 
-// admin routes
-// GET / api / admin / products
-// GET / api / admin / products /: id
+// const {
+//     getAdminProducts,
+//     getAdminProductById,
+//     createProduct,
+//     updateProduct,
+//     deleteProduct,
+//     uploadProductImages,
+//     updateProductStatus
+// } = require("../controllers/product.controller");
 
-// POST / api / admin / products
-// PUT / api / admin / products /: id
-// DELETE / api / admin / products /: id
+// const {
+//     requireAdmin
+// } = require("../middleware/admin.middleware");
 
-// POST / api / admin / products / upload - images
+// const upload =
+//     require("../middleware/upload.middleware");
 
-// update product
-// PATCH
-//     / api / admin / products /: id / status
+// const router = express.Router();
+
+
+// // ========================================
+// // ADMIN AUTH
+// // ========================================
+
+// router.use(requireAdmin);
+
+
+// // ========================================
+// // PRODUCT LIST
+// // GET /api/admin/products
+// // ========================================
+
+// router.get(
+//     "/",
+//     getAdminProducts
+// );
+
+
+// // ========================================
+// // PRODUCT DETAIL
+// // GET /api/admin/products/:id
+// // ========================================
+
+// router.get(
+//     "/:id",
+//     getAdminProductById
+// );
+
+
+// // ========================================
+// // CREATE PRODUCT
+// // POST /api/admin/products
+// // ========================================
+
+// router.post(
+//     "/",
+//     upload.array("images", 5),
+//     createProduct
+// );
+
+
+// // ========================================
+// // UPDATE PRODUCT
+// // PUT /api/admin/products/:id
+// // ========================================
+
+// router.put(
+//     "/:id",
+//     upload.array("images", 5),
+//     updateProduct
+// );
+
+
+// // ========================================
+// // DELETE PRODUCT
+// // DELETE /api/admin/products/:id
+// // ========================================
+
+// router.delete(
+//     "/:id",
+//     deleteProduct
+// );
+
+
+// // ========================================
+// // UPDATE STATUS
+// // PATCH /api/admin/products/:id/status
+// // ========================================
+
+// router.patch(
+//     "/:id/status",
+//     updateProductStatus
+// );
+
+
+// // ========================================
+// // UPLOAD IMAGES
+// // POST /api/admin/products/upload-images
+// // ========================================
+
+// router.post(
+//     "/upload-images",
+//     upload.array("images", 5),
+//     uploadProductImages
+// );
+
+
+// module.exports = router;
 
 const express = require("express");
 
@@ -29,14 +125,13 @@ const {
     requireAdmin
 } = require("../middleware/admin.middleware");
 
-const upload =
-    require("../middleware/upload.middleware");
+const upload = require("../middleware/upload.middleware");
 
 const router = express.Router();
 
 
 // ========================================
-// ALL ADMIN PRODUCT ROUTES
+// ADMIN AUTH
 // ========================================
 
 router.use(requireAdmin);
@@ -44,9 +139,9 @@ router.use(requireAdmin);
 
 // ========================================
 // PRODUCT LIST
+// GET /api/admin/products
 // ========================================
 
-// GET /api/admin/products
 router.get(
     "/",
     getAdminProducts
@@ -54,7 +149,40 @@ router.get(
 
 
 // ========================================
-// PRODUCT DETAIL
+// UPLOAD PRODUCT IMAGES
+// IMPORTANT: BEFORE /:id
+// POST /api/admin/products/upload-images
+// ========================================
+
+router.post(
+    "/upload-images",
+    upload.array("images", 5),
+    uploadProductImages
+);
+
+
+// ========================================
+// CREATE PRODUCT
+// POST /api/admin/products
+// ========================================
+
+// router.post(
+//     "/",
+//     upload.array("images", 5),
+//     createProduct
+// );
+
+router.post(
+    "/",
+    requireAdmin,
+    createProduct
+);
+
+
+// ========================================
+// UPDATE PRODUCT STATUS
+// PATCH /api/admin/products/:id/status
+// IMPORTANT: BEFORE /:id
 // ========================================
 
 router.patch(
@@ -62,7 +190,12 @@ router.patch(
     updateProductStatus
 );
 
+
+// ========================================
+// PRODUCT DETAIL
 // GET /api/admin/products/:id
+// ========================================
+
 router.get(
     "/:id",
     getAdminProductById
@@ -70,22 +203,10 @@ router.get(
 
 
 // ========================================
-// CREATE PRODUCT
-// ========================================
-
-// POST /api/admin/products
-router.post(
-    "/",
-    upload.array("images", 5),
-    createProduct
-);
-
-
-// ========================================
 // UPDATE PRODUCT
+// PUT /api/admin/products/:id
 // ========================================
 
-// PUT /api/admin/products/:id
 router.put(
     "/:id",
     upload.array("images", 5),
@@ -94,26 +215,18 @@ router.put(
 
 
 // ========================================
-// DELETE / DEACTIVATE PRODUCT
+// DELETE PRODUCT
+// DELETE /api/admin/products/:id
 // ========================================
 
-// DELETE /api/admin/products/:id
+router.put(
+    "/:id",
+    updateProduct
+);
+
 router.delete(
     "/:id",
     deleteProduct
-);
-
-
-// ========================================
-// UPLOAD PRODUCT IMAGES
-// ========================================
-
-// POST /api/admin/products/upload-images
-
-router.post(
-    "/upload-images",
-    upload.array("images", 5),
-    uploadProductImages
 );
 
 
