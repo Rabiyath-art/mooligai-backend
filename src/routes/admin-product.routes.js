@@ -166,17 +166,18 @@ router.post(
 // POST /api/admin/products
 // ========================================
 
+router.post(
+    "/",
+    upload.array("images", 5),
+    createProduct
+);
+
 // router.post(
 //     "/",
-//     upload.array("images", 5),
+//     requireAdmin,
 //     createProduct
 // );
 
-router.post(
-    "/",
-    requireAdmin,
-    createProduct
-);
 
 
 // ========================================
@@ -219,10 +220,10 @@ router.put(
 // DELETE /api/admin/products/:id
 // ========================================
 
-router.put(
-    "/:id",
-    updateProduct
-);
+// router.put(
+//     "/:id",
+//     updateProduct
+// );
 
 router.delete(
     "/:id",

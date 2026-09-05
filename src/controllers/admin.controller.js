@@ -2,46 +2,19 @@ const adminService =
     require("../services/admin.service");
 
 
-const getDashboardStats = async (
-    req,
-    res
-) => {
-
+const getDashboardStats = async (req, res) => {
     try {
-
-        const data =
-            await adminService.getDashboardStats();
-
-
+        const data = await adminService.getDashboardStats();
         res.status(200).json({
-
             success: true,
-
             data
-
         });
-
     } catch (error) {
-
-        console.error(
-            "Admin dashboard error:",
-            error
-        );
-
         res.status(500).json({
-
             success: false,
-
-            message:
-                "Failed to load dashboard"
-
+            message: "Failed to load dashboard"
         });
-
     }
-
 };
 
-
-module.exports = {
-    getDashboardStats
-};
+module.exports = { getDashboardStats };

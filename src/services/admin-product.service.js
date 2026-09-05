@@ -253,75 +253,15 @@ const getAdminProducts = async (query) => {
 // GET ADMIN PRODUCT BY ID
 // ========================================
 
-const getAdminProductById = async (
-    req,
-    res
-) => {
+const getAdminProductById = async (id) => {
 
-    try {
-
-        const { id } = req.params;
-
-
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message: "Invalid product ID"
-
-            });
-
-        }
-
-
-        const product =
-            await adminProductService
-                .getAdminProductById(id);
-
-
-        if (!product) {
-
-            return res.status(404).json({
-
-                success: false,
-
-                message: "Product not found"
-
-            });
-
-        }
-
-
-        return res.status(200).json({
-
-            success: true,
-
-            data: product
-
-        });
-
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return null;
     }
 
-    catch (error) {
-
-        console.error(
-            "Admin product detail error:",
-            error
-        );
-
-
-        return res.status(500).json({
-
-            success: false,
-
-            message: error.message
-
-        });
-
-    }
-
+    return await Product.findById(id)
+        .populate("category", "name slug")
+        .lean();
 };
 
 // ========================================
